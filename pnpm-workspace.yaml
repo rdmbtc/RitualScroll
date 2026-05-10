@@ -1,0 +1,6 @@
+allowBuilds:
+  '@biomejs/biome': false
+  '@reown/appkit': set this to true or false
+  protobufjs: set this to true or false
+  sharp: false
+  unrs-resolver: false
