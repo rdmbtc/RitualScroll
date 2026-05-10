@@ -54,20 +54,24 @@ export async function GET(
   }
 
   // 1. Verify access on-chain
-  try {
-    const hasAccess = await publicClient.readContract({
-      address: CONTRACT_ADDRESS,
-      abi: PROMPT_ACCESS_ABI,
-      functionName: 'checkAccess',
-      args: [address as `0x${string}`, id]
-    });
+  if (process.env.NODE_ENV !== 'development') {
+    try {
+      const hasAccess = await publicClient.readContract({
+        address: CONTRACT_ADDRESS,
+        abi: PROMPT_ACCESS_ABI,
+        functionName: 'checkAccess',
+        args: [address as `0x${string}`, id]
+      });
 
-    if (!hasAccess) {
-      return NextResponse.json({ error: 'Access denied' }, { status: 403 });
+      if (!hasAccess) {
+        return NextResponse.json({ error: 'Access denied' }, { status: 403 });
+      }
+    } catch (err) {
+      console.error('Error checking access:', err);
+      return NextResponse.json({ error: 'Failed to verify access' }, { status: 500 });
     }
-  } catch (err) {
-    console.error('Error checking access:', err);
-    return NextResponse.json({ error: 'Failed to verify access' }, { status: 500 });
+  } else {
+    console.log('⚠️ Bypassing access check in development mode');
   }
 
   // 2. Map ID to filename
